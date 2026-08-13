@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize'
 import pg from 'pg'
 
-const url = process.env.DATABASE_URL || ''
+const url = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_8RKTYC3lUVES@ep-tiny-fog-avy5pyvi-pooler.c-11.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require'
 
 const sequelize = url
     ? new Sequelize(url, {
