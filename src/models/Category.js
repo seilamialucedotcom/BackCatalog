@@ -23,7 +23,6 @@ const Category = sequelize.define(
     image_url: {
       type: DataTypes.TEXT,
       allowNull: false,
-      validate: { isUrl: true },
     },
     order_index: {
       type: DataTypes.INTEGER,

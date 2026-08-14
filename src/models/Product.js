@@ -42,7 +42,6 @@ const Product = sequelize.define(
     image_url: {
       type: DataTypes.TEXT,
       allowNull: false,
-      validate: { isUrl: true },
     },
     is_featured: {
       type: DataTypes.BOOLEAN,

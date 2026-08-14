@@ -5,7 +5,10 @@ let databaseReady;
 
 async function ensureDatabaseConnection() {
   if (!databaseReady) {
-    databaseReady = sequelize.authenticate();
+    databaseReady = (async () => {
+      await sequelize.authenticate();
+      await sequelize.sync();
+    })();
     try {
       await databaseReady;
       console.log('Conexión a la base de datos establecida correctamente.');
