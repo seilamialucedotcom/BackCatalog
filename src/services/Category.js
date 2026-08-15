@@ -2,7 +2,7 @@ import sequelize from '../config/database.js';
 import Category from '../models/Category.js';
 import Product from '../models/Product.js';
 import categoryRepository from '../repositories/Category.js';
-import cloudinary from '../config/cloudinary.js'; // 1. Importamos la configuración de Cloudinary
+import cloudinary from '../config/cloudinary.js';
 
 const slugify = (value) => String(value || '').toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 const error = (message, status = 400) => Object.assign(new Error(message), { status });
@@ -16,13 +16,12 @@ class CategoryService {
     
     if (!name || !image_url) throw error('El nombre y la imagen de la categoría son obligatorios.');
 
-    // 2. Si la imagen es un Base64 (subida desde la PC), la subimos a Cloudinary
-    if (image_url.startsWith('data:image')) {
+    // Procesa Base64 y enlaces externos; ignora imágenes que ya están en Cloudinary
+    if (!image_url.includes('res.cloudinary.com')) {
       try {
         const uploadResponse = await cloudinary.uploader.upload(image_url, {
           folder: 'catalogo',
         });
-        // Reemplazamos el Base64 gigante por la URL corta que nos da Cloudinary
         image_url = uploadResponse.secure_url;
       } catch (err) {
         console.error('Error subiendo imagen a Cloudinary:', err);
