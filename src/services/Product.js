@@ -7,6 +7,24 @@ const slugify = (value) => String(value || '').toLowerCase().trim().normalize('N
 const error = (message, status = 400) => Object.assign(new Error(message), { status });
 const asBoolean = (value) => value === true || value === 'true' || value === '1' || value === 1;
 
+// El editor solo necesita estos elementos. Se descarta cualquier atributo y
+// cualquier etiqueta no permitida antes de persistir la descripción.
+function sanitizeDescription(value) {
+  const source = String(value || '').trim();
+  if (!source) return null;
+
+  const allowedTags = { p: 'p', br: 'br', strong: 'strong', b: 'strong', em: 'em', i: 'em', ul: 'ul', ol: 'ol', li: 'li' };
+  return source
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/<\s*(script|style|iframe|object|embed|svg|math)[^>]*>[\s\S]*?<\s*\/\s*\1\s*>/gi, '')
+    .replace(/<\s*(\/?)\s*([a-z0-9]+)(?:\s[^>]*)?>/gi, (match, closing, tagName) => {
+      const tag = allowedTags[tagName.toLowerCase()];
+      if (!tag) return '';
+      return closing ? `</${tag}>` : `<${tag}>`;
+    })
+    .trim() || null;
+}
+
 function serialize(product) {
   const value = product.get ? product.get({ plain: true }) : product;
   return { ...value, category_name: value.category?.name || 'Sin categoría', subcategory_name: value.subcategory?.name || '', category: undefined, subcategory: undefined };
@@ -52,7 +70,7 @@ class ProductService {
     }
 
     const payload = {
-      name, slug: slugify(name), description: String(data.description || '').trim() || null,
+      name, slug: slugify(name), description: sanitizeDescription(data.description),
       price, category_id, subcategory_id, image_url, is_featured: asBoolean(data.is_featured),
       stock: Number.isFinite(Number(data.stock)) ? Math.max(0, Number(data.stock)) : 10,
     };
