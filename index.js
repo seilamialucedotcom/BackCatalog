@@ -1,5 +1,6 @@
 import app from './app.js';
 import sequelize from './src/config/database.js';
+import synchronizeDatabase from './src/config/schema.js';
 import 'dotenv/config';
 
 let databaseReady;
@@ -8,7 +9,7 @@ async function ensureDatabaseConnection() {
   if (!databaseReady) {
     databaseReady = (async () => {
       await sequelize.authenticate();
-      await sequelize.sync();
+      await synchronizeDatabase();
     })();
     try {
       await databaseReady;
@@ -33,7 +34,7 @@ async function handler(req, res) {
 
 if (!process.env.VERCEL) {
   const port = process.env.PORT || 3000;
-  sequelize.sync().then(() => {
+  synchronizeDatabase().then(() => {
     app.listen(port, () => console.log(`Servidor escuchando en el puerto ${port}.`));
   }).catch((error) => console.error('No se pudo iniciar el servidor:', error));
 }

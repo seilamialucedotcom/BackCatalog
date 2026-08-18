@@ -1,4 +1,5 @@
 import { Op } from 'sequelize';
+import Brand from '../models/Brand.js';
 import Product from '../models/Product.js';
 import Category from '../models/Category.js';
 import Subcategory from '../models/Subcategory.js';
@@ -18,6 +19,7 @@ class ProductRepository {
     return Product.findAll({
       where,
       include: [
+        { model: Brand, as: 'brand' },
         { model: Category, as: 'category', attributes: ['id', 'name'] },
         { model: Subcategory, as: 'subcategory', attributes: ['id', 'name'] },
       ],
@@ -28,6 +30,7 @@ class ProductRepository {
   findByIdWithRelations(id) {
     return Product.findByPk(id, {
       include: [
+        { model: Brand, as: 'brand' },
         { model: Category, as: 'category', attributes: ['id', 'name'] },
         { model: Subcategory, as: 'subcategory', attributes: ['id', 'name'] },
       ],

@@ -39,6 +39,11 @@ const Product = sequelize.define(
       allowNull: true,
       references: { model: 'subcategories', key: 'id' },
     },
+    brand_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: { model: 'brands', key: 'id' },
+    },
     image_url: {
       type: DataTypes.TEXT,
       allowNull: false,
@@ -50,8 +55,8 @@ const Product = sequelize.define(
     },
     stock: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 0,
+      allowNull: true,
+      defaultValue: null,
       validate: { min: 0 },
     },
   },

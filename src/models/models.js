@@ -1,4 +1,5 @@
 import sequelize from '../config/database.js';
+import Brand from './Brand.js';
 import Category from './Category.js';
 import Product from './Product.js';
 import StoreSettings from './StoreSettings.js';
@@ -26,4 +27,7 @@ Subcategory.hasMany(Product, {
 });
 Product.belongsTo(Subcategory, { foreignKey: 'subcategory_id', as: 'subcategory' });
 
-export { sequelize, User, StoreSettings, Category, Subcategory, Product };
+Product.belongsTo(Brand, { foreignKey: 'brand_id', as: 'brand' });
+Brand.hasMany(Product, { foreignKey: 'brand_id', as: 'products' });
+
+export { sequelize, User, StoreSettings, Brand, Category, Subcategory, Product };

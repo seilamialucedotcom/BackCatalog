@@ -1,4 +1,5 @@
 import categoryRepository from '../repositories/Category.js';
+import brandRepository from '../repositories/Brand.js';
 import productRepository from '../repositories/Product.js';
 import subcategoryRepository from '../repositories/Subcategory.js';
 import cloudinary from '../config/cloudinary.js';
@@ -6,6 +7,18 @@ import cloudinary from '../config/cloudinary.js';
 const slugify = (value) => String(value || '').toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 const error = (message, status = 400) => Object.assign(new Error(message), { status });
 const asBoolean = (value) => value === true || value === 'true' || value === '1' || value === 1;
+const optionalId = (value, field) => {
+  if (value === undefined || value === null || value === '') return null;
+  const id = Number(value);
+  if (!Number.isInteger(id) || id < 1) throw error(`${field} no valido.`);
+  return id;
+};
+const nullableStock = (value) => {
+  if (value === undefined || value === null || value === '') return null;
+  const stock = Number(value);
+  if (!Number.isInteger(stock) || stock < 0) throw error('El stock debe ser un numero entero no negativo o null.');
+  return stock;
+};
 
 // El editor solo necesita estos elementos. Se descarta cualquier atributo y
 // cualquier etiqueta no permitida antes de persistir la descripción.
@@ -45,8 +58,10 @@ class ProductService {
     const name = String(data.name || '').trim();
     let image_url = String(data.image_url || '').trim();
     const price = Number(data.price);
-    const category_id = data.category_id ? Number(data.category_id) : null;
-    const subcategory_id = data.subcategory_id ? Number(data.subcategory_id) : null;
+    const category_id = optionalId(data.category_id, 'Categoria');
+    const subcategory_id = optionalId(data.subcategory_id, 'Subcategoria');
+    const brand_id = optionalId(data.brand_id, 'Marca');
+    const stock = nullableStock(data.stock);
 
     if (!name || !image_url || !Number.isFinite(price) || price < 0) throw error('Nombre, imagen y precio válido son obligatorios.');
 
@@ -64,6 +79,7 @@ class ProductService {
     }
 
     if (category_id && !await categoryRepository.findById(category_id)) throw error('Categoría no encontrada.', 404);
+    if (brand_id && !await brandRepository.findById(brand_id)) throw error('Marca no encontrada.', 404);
     if (subcategory_id) {
       const subcategory = await subcategoryRepository.findById(subcategory_id);
       if (!subcategory || subcategory.category_id !== category_id) throw error('La subcategoría no pertenece a la categoría seleccionada.');
@@ -71,8 +87,7 @@ class ProductService {
 
     const payload = {
       name, slug: slugify(name), description: sanitizeDescription(data.description),
-      price, category_id, subcategory_id, image_url, is_featured: asBoolean(data.is_featured),
-      stock: Number.isFinite(Number(data.stock)) ? Math.max(0, Number(data.stock)) : 10,
+      price, category_id, subcategory_id, brand_id, image_url, is_featured: asBoolean(data.is_featured), stock,
     };
 
     if (id) {

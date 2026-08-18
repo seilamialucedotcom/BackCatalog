@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 
 import './src/models/models.js';
+import brandRoutes from './src/routes/Brand.js';
 import categoryRoutes from './src/routes/Category.js';
 import productRoutes from './src/routes/Product.js';
 import storeSettingsRoutes from './src/routes/StoreSettings.js';
@@ -58,6 +59,7 @@ app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 app.get('/api/catalog', storeSettingsController.getCatalog.bind(storeSettingsController));
 app.use('/api/settings', storeSettingsRoutes);
+app.use('/api/brands', brandRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/subcategories', subcategoryRoutes);
 app.use('/api/products', productRoutes);
