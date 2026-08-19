@@ -26,7 +26,7 @@ function sanitizeDescription(value) {
   const source = String(value || '').trim();
   if (!source) return null;
 
-  const allowedTags = { p: 'p', br: 'br', strong: 'strong', b: 'strong', em: 'em', i: 'em', ul: 'ul', ol: 'ol', li: 'li' };
+  const allowedTags = { p: 'p', br: 'br', strong: 'strong', b: 'strong', em: 'em', i: 'em', ul: 'ul', ol: 'ol', li: 'li', mark: 'mark' };
   return source
     .replace(/<!--[\s\S]*?-->/g, '')
     .replace(/<\s*(script|style|iframe|object|embed|svg|math)[^>]*>[\s\S]*?<\s*\/\s*\1\s*>/gi, '')
