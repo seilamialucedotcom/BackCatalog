@@ -32,7 +32,7 @@ const portions = (value) => {
 
   return value.map((portion, index) => {
     const label = String(portion?.label || '').trim();
-    const amount = Number(portion?.amount);
+    const amount = 1;
     const price = Number(portion?.price);
 
     if (!label || !Number.isFinite(amount) || amount <= 0 || !Number.isFinite(price) || price < 0) {
