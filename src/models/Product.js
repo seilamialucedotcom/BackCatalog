@@ -59,6 +59,12 @@ const Product = sequelize.define(
       defaultValue: null,
       validate: { min: 0 },
     },
+    unit_type: {
+      type: DataTypes.STRING(20),
+      allowNull: false,
+      defaultValue: 'unidad',
+      validate: { isIn: [['unidad', 'paquete', 'kg']] },
+    },
   },
   {
     tableName: 'products',

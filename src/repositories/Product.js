@@ -3,6 +3,14 @@ import Brand from '../models/Brand.js';
 import Product from '../models/Product.js';
 import Category from '../models/Category.js';
 import Subcategory from '../models/Subcategory.js';
+import ProductPortion from '../models/ProductPortion.js';
+
+const productIncludes = [
+  { model: Brand, as: 'brand' },
+  { model: Category, as: 'category', attributes: ['id', 'name'] },
+  { model: Subcategory, as: 'subcategory', attributes: ['id', 'name'] },
+  { model: ProductPortion, as: 'portions' },
+];
 
 class ProductRepository {
   findAll(filters = {}) {
@@ -18,26 +26,26 @@ class ProductRepository {
     if (filters.is_featured) where.is_featured = true;
     return Product.findAll({
       where,
-      include: [
-        { model: Brand, as: 'brand' },
-        { model: Category, as: 'category', attributes: ['id', 'name'] },
-        { model: Subcategory, as: 'subcategory', attributes: ['id', 'name'] },
-      ],
+      include: productIncludes,
       order: [['created_at', 'DESC'], ['id', 'DESC']],
     });
   }
-  findById(id) { return Product.findByPk(id); }
-  findByIdWithRelations(id) {
+  findById(id, options = {}) { return Product.findByPk(id, options); }
+  findByIdWithRelations(id, options = {}) {
     return Product.findByPk(id, {
-      include: [
-        { model: Brand, as: 'brand' },
-        { model: Category, as: 'category', attributes: ['id', 'name'] },
-        { model: Subcategory, as: 'subcategory', attributes: ['id', 'name'] },
-      ],
+      ...options,
+      include: productIncludes,
     });
   }
-  create(data) { return Product.create(data); }
-  update(id, data) { return Product.update(data, { where: { id } }); }
+  create(data, options = {}) { return Product.create(data, options); }
+  update(id, data, options = {}) { return Product.update(data, { where: { id }, ...options }); }
+  replacePortions(productId, portions, transaction) {
+    return ProductPortion.destroy({ where: { product_id: productId }, transaction })
+      .then(() => ProductPortion.bulkCreate(
+        portions.map((portion) => ({ ...portion, product_id: productId })),
+        { transaction },
+      ));
+  }
   remove(id) { return Product.destroy({ where: { id } }); }
 }
 

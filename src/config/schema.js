@@ -17,6 +17,14 @@ async function synchronizeDatabase() {
     });
   }
 
+  if (!columns.unit_type) {
+    await queryInterface.addColumn('products', 'unit_type', {
+      type: DataTypes.STRING(20),
+      allowNull: false,
+      defaultValue: 'unidad',
+    });
+  }
+
   const stock = columns.stock;
   if (stock && (!stock.allowNull || stock.defaultValue != null)) {
     await queryInterface.changeColumn('products', 'stock', {

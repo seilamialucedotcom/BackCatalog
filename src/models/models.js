@@ -2,6 +2,7 @@ import sequelize from '../config/database.js';
 import Brand from './Brand.js';
 import Category from './Category.js';
 import Product from './Product.js';
+import ProductPortion from './ProductPortion.js';
 import StoreSettings from './StoreSettings.js';
 import Subcategory from './Subcategory.js';
 import User from './User.js';
@@ -30,4 +31,11 @@ Product.belongsTo(Subcategory, { foreignKey: 'subcategory_id', as: 'subcategory'
 Product.belongsTo(Brand, { foreignKey: 'brand_id', as: 'brand' });
 Brand.hasMany(Product, { foreignKey: 'brand_id', as: 'products' });
 
-export { sequelize, User, StoreSettings, Brand, Category, Subcategory, Product };
+Product.hasMany(ProductPortion, {
+  foreignKey: 'product_id',
+  as: 'portions',
+  onDelete: 'CASCADE',
+});
+ProductPortion.belongsTo(Product, { foreignKey: 'product_id', as: 'product' });
+
+export { sequelize, User, StoreSettings, Brand, Category, Subcategory, Product, ProductPortion };
